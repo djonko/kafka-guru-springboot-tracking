@@ -14,7 +14,7 @@ public class DispatchPreparedHandler {
     private final TrackingService trackingService;
 
     @KafkaListener(
-            id = "orderConsumerClient",
+            id = "dispatchPreparedConsumerClient",
             topics = "dispatch.tracking",
             groupId = "dispatch.tracking.consumer",
             containerFactory = "kafkaListenerContainerFactory"
