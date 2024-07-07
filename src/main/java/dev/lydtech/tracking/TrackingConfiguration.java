@@ -21,6 +21,9 @@ import java.util.Map;
 @Configuration
 @ComponentScan(basePackages = {"dev.lydtech"})
 public class TrackingConfiguration {
+    public static final String DISPATCH_TRACKING_TOPIC = "dispatch.tracking";
+    public static final String TRACKING_STATUS_TOPIC = "tracking.status";
+
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(ConsumerFactory<String, Object> consumerFactory) {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();

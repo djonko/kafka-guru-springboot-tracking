@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutionException;
 
+import static dev.lydtech.tracking.TrackingConfiguration.TRACKING_STATUS_TOPIC;
+
 @Service
 @RequiredArgsConstructor
 public class TrackingService {
-    public static final String TRACKING_STATUS_TOPIC = "tracking.status";
+
     private final KafkaTemplate<String, Object> kafkaProducer;
 
 

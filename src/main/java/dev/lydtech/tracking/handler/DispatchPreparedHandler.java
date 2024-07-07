@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import static dev.lydtech.tracking.TrackingConfiguration.DISPATCH_TRACKING_TOPIC;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -15,7 +17,7 @@ public class DispatchPreparedHandler {
 
     @KafkaListener(
             id = "dispatchPreparedConsumerClient",
-            topics = "dispatch.tracking",
+            topics = DISPATCH_TRACKING_TOPIC,
             groupId = "dispatch.tracking.consumer",
             containerFactory = "kafkaListenerContainerFactory"
     )

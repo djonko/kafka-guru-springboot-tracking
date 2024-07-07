@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class DispatchPreparedHandlerTest {
@@ -19,7 +18,7 @@ class DispatchPreparedHandlerTest {
     @BeforeEach
     void setUp() {
         trackingService = mock(TrackingService.class);
-        dispatchPreparedHandler= new DispatchPreparedHandler(trackingService);
+        dispatchPreparedHandler = new DispatchPreparedHandler(trackingService);
     }
 
     @Test

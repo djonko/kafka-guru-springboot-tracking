@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import static dev.lydtech.tracking.TrackingConfiguration.TRACKING_STATUS_TOPIC;
 import static org.mockito.Mockito.*;
 
 class TrackingServiceTest {
@@ -31,6 +32,6 @@ class TrackingServiceTest {
 
         DispatchPrepared dispatchPrepared = DispatchPrepared.builder().orderId(UUID.randomUUID()).build();
         trackingService.updateTrackingStatus(dispatchPrepared);
-        verify(kafkaProducerMock, times(1)).send(eq(TrackingService.TRACKING_STATUS_TOPIC), any(TrackingStatusUpdated.class));
+        verify(kafkaProducerMock, times(1)).send(eq(TRACKING_STATUS_TOPIC), any(TrackingStatusUpdated.class));
     }
 }
