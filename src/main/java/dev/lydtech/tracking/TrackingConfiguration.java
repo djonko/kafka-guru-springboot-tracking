@@ -1,6 +1,5 @@
 package dev.lydtech.tracking;
 
-import dev.lydtech.tracking.message.DispatchPrepared;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -23,6 +22,7 @@ import java.util.Map;
 public class TrackingConfiguration {
     public static final String DISPATCH_TRACKING_TOPIC = "dispatch.tracking";
     public static final String TRACKING_STATUS_TOPIC = "tracking.status";
+    private static final String TRUSTED_MESSAGES_PACKAGE = "dev.lydtech.tracking.message";
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(ConsumerFactory<String, Object> consumerFactory) {
@@ -37,7 +37,7 @@ public class TrackingConfiguration {
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         config.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
-        config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DispatchPrepared.class.getCanonicalName());
+        config.put(JsonDeserializer.TRUSTED_PACKAGES, TRUSTED_MESSAGES_PACKAGE);
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(config);
     }
@@ -50,7 +50,7 @@ public class TrackingConfiguration {
     @Bean
     public ProducerFactory<String, Object> producerFactory(@Value("${kafka.bootstrap-servers}") String bootstrapServers) {
         Map<String, Object> config = new HashMap<>();
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,bootstrapServers);
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         return new DefaultKafkaProducerFactory<>(config);
