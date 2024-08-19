@@ -1,5 +1,6 @@
 package dev.lydtech.tracking.handler;
 
+import dev.lydtech.tracking.message.DispatchCompleted;
 import dev.lydtech.tracking.message.DispatchPrepared;
 import dev.lydtech.tracking.service.TrackingService;
 import lombok.RequiredArgsConstructor;
@@ -14,23 +15,31 @@ import static dev.lydtech.tracking.TrackingConfiguration.DISPATCH_TRACKING_TOPIC
 @Component
 @RequiredArgsConstructor
 @KafkaListener(
-        id = "dispatchPreparedConsumerClient",
+        id = "dispatchEventConsumerClient",
         topics = DISPATCH_TRACKING_TOPIC,
         groupId = "dispatch.tracking.consumer",
         containerFactory = "kafkaListenerContainerFactory"
 )
-public class DispatchPreparedHandler {
+public class DispatchEventHandler {
     private final TrackingService trackingService;
 
-
     @KafkaHandler
-    public void listen(DispatchPrepared payload){
-        log.info("Received message: {}", payload);
+    public void dispatchPrepared(DispatchPrepared payload) {
+        log.info("dispatchPrepared - Received message: {}", payload);
         try {
             trackingService.updateTrackingStatus(payload);
         } catch (Exception e) {
             log.error("update Tracking Status failure: {}", payload, e);
         }
+    }
 
+    @KafkaHandler
+    public void dispatchCompleted(DispatchCompleted payload) {
+        log.info("dispatchCompleted - Received message: {}", payload);
+        try {
+            trackingService.updateTrackingStatus(payload);
+        } catch (Exception e) {
+            log.error("update Tracking Status failure: {}", payload, e);
+        }
     }
 }

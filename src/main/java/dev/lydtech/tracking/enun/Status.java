@@ -1,5 +1,6 @@
 package dev.lydtech.tracking.enun;
 
 public enum Status {
-    PREPARING
+    PREPARING,
+    COMPLETED
 }

@@ -1,6 +1,7 @@
 package dev.lydtech.tracking.integration;
 
 import dev.lydtech.tracking.TrackingConfiguration;
+import dev.lydtech.tracking.message.DispatchCompleted;
 import dev.lydtech.tracking.message.DispatchPrepared;
 import dev.lydtech.tracking.message.TrackingStatusUpdated;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,8 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,7 +38,7 @@ import static org.hamcrest.Matchers.equalTo;
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @EmbeddedKafka(controlledShutdown = true)
-public class DispatchPreparedHandler {
+public class DispatchEventHandlerTest {
     @Autowired
     private KafkaTemplate kafkaTemplate;
 
@@ -45,9 +48,7 @@ public class DispatchPreparedHandler {
     @BeforeEach
     public void setUp(@Autowired EmbeddedKafkaBroker broker, @Autowired KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry) {
         kafkaTestListener.trackingStatusCounter.set(0);
-        kafkaListenerEndpointRegistry.getListenerContainers().forEach(container -> {
-            ContainerTestUtils.waitForAssignment(container, broker.getPartitionsPerTopic());
-        });
+        kafkaListenerEndpointRegistry.getListenerContainers().forEach(container -> ContainerTestUtils.waitForAssignment(container, broker.getPartitionsPerTopic()));
 
     }
 
@@ -56,6 +57,10 @@ public class DispatchPreparedHandler {
         DispatchPrepared dispatchPrepared = DispatchPrepared.builder().orderId(UUID.randomUUID()).build();
         sendMessage(dispatchPrepared);
         await().atMost(3, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS).until(kafkaTestListener.trackingStatusCounter::get, equalTo(1));
+
+        DispatchCompleted dispatchCompleted = DispatchCompleted.builder().orderId(UUID.randomUUID()).date(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).build();
+        sendMessage(dispatchCompleted);
+        await().atMost(3, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS).until(kafkaTestListener.trackingStatusCounter::get, equalTo(2));
     }
 
     private void sendMessage(Object data) throws Exception {
@@ -66,7 +71,7 @@ public class DispatchPreparedHandler {
     static class TestConfig {
 
         @Bean
-        public KafkaTestListener testListener() {
+        public KafkaTestListener kafkaTestListener() {
             return new KafkaTestListener();
         }
     }
@@ -78,8 +83,10 @@ public class DispatchPreparedHandler {
 
         /**
          * To test the tracking update status producer
-         * @param  payload DispatchPrepared
+         *
+         * @param payload DispatchPrepared
          */
+        //@KafkaHandler
         @KafkaListener(groupId = "KafkaIntegrationTest", topics = TRACKING_STATUS_TOPIC)
         void receiveTrackingStatus(@Payload TrackingStatusUpdated payload) {
             log.debug("Received updated tracking status: {}", payload);

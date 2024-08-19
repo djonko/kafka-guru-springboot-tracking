@@ -1,6 +1,7 @@
 package dev.lydtech.tracking.service;
 
 import dev.lydtech.tracking.enun.Status;
+import dev.lydtech.tracking.message.DispatchCompleted;
 import dev.lydtech.tracking.message.DispatchPrepared;
 import dev.lydtech.tracking.message.TrackingStatusUpdated;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +18,19 @@ public class TrackingService {
 
     private final KafkaTemplate<String, Object> kafkaProducer;
 
-
     public void updateTrackingStatus(DispatchPrepared dispatchPrepared) throws ExecutionException, InterruptedException {
         TrackingStatusUpdated trackingStatusUpdated = TrackingStatusUpdated.builder()
                 .orderId(dispatchPrepared.getOrderId())
                 .status(Status.PREPARING).build();
-        
-        this.kafkaProducer.send(TRACKING_STATUS_TOPIC, trackingStatusUpdated).get();
 
+        this.kafkaProducer.send(TRACKING_STATUS_TOPIC, trackingStatusUpdated).get();
+    }
+
+    public void updateTrackingStatus(DispatchCompleted dispatchCompleted) throws ExecutionException, InterruptedException {
+        TrackingStatusUpdated trackingStatusUpdated = TrackingStatusUpdated.builder()
+                .orderId(dispatchCompleted.getOrderId())
+                .status(Status.COMPLETED).build();
+
+        this.kafkaProducer.send(TRACKING_STATUS_TOPIC, trackingStatusUpdated).get();
     }
 }

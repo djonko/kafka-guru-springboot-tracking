@@ -1,5 +1,6 @@
 package dev.lydtech.tracking.service;
 
+import dev.lydtech.tracking.message.DispatchCompleted;
 import dev.lydtech.tracking.message.DispatchPrepared;
 import dev.lydtech.tracking.message.TrackingStatusUpdated;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -33,5 +36,9 @@ class TrackingServiceTest {
         DispatchPrepared dispatchPrepared = DispatchPrepared.builder().orderId(UUID.randomUUID()).build();
         trackingService.updateTrackingStatus(dispatchPrepared);
         verify(kafkaProducerMock, times(1)).send(eq(TRACKING_STATUS_TOPIC), any(TrackingStatusUpdated.class));
+
+        DispatchCompleted dispatchCompleted = DispatchCompleted.builder().orderId(UUID.randomUUID()).date(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).build();
+        trackingService.updateTrackingStatus(dispatchCompleted);
+        verify(kafkaProducerMock, times(2)).send(eq(TRACKING_STATUS_TOPIC), any(TrackingStatusUpdated.class));
     }
 }

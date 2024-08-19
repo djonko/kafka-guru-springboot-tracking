@@ -18,11 +18,20 @@ class StatusUpdatedTest {
     }
 
     @Test
-    void validate_TrackingStatusUpdated_success(){
+    void validate_TrackingStatusUpdated_Preparing_success(){
         TrackingStatusUpdated trackingStatusUpdated = TrackingStatusUpdated.builder()
                 .orderId(uuid).status(Status.PREPARING).build();
         assertNotNull(trackingStatusUpdated);
         assertEquals(trackingStatusUpdated.getOrderId().toString(), uuid.toString());
         assertEquals(trackingStatusUpdated.getStatus(), Status.PREPARING);
+    }
+
+    @Test
+    void validate_TrackingStatusUpdated_Completing_success(){
+        TrackingStatusUpdated trackingStatusUpdated = TrackingStatusUpdated.builder()
+                .orderId(uuid).status(Status.COMPLETED).build();
+        assertNotNull(trackingStatusUpdated);
+        assertEquals(trackingStatusUpdated.getOrderId().toString(), uuid.toString());
+        assertEquals(trackingStatusUpdated.getStatus(), Status.COMPLETED);
     }
 }
